@@ -1,19 +1,33 @@
 import 'package:flutter_knn_app/model/symptom.dart';
 
 class MedicalData {
-  final String name;
+  final int pregnancies;
+  final int glucose;
+  final int skinThickness;
+  final int insulin;
+  final double bmi;
   final int age;
-  final String gender;
-  final String bloodType;
-  final int bmi;
-  final List<Symptom> symptoms;
+  final List<Symptom>? symptoms;
 
   MedicalData({
-    required this.name,
-    required this.age,
-    required this.gender,
-    required this.bloodType,
+    required this.pregnancies,
+    required this.glucose,
+    required this.skinThickness,
+    required this.insulin,
     required this.bmi,
-    required this.symptoms,
+    required this.age,
+    this.symptoms
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'Pregnancies': pregnancies,
+      'Glucose': glucose,
+      'SkinThickness': skinThickness,
+      'Insulin': insulin,
+      'BMI': bmi,
+      'Age': age,
+      'Symptoms': symptoms
+    };
+  }
 }
