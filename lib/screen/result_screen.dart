@@ -1,20 +1,150 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_knn_app/provider/classification_provider.dart';
+import 'package:flutter/scheduler.dart' show timeDilation;
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final result = Provider.of<ClassificationProvider>(context).result;
+  State<ResultScreen> createState() => _ResultScreenState();
+}
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Analysis Result'),
+class _ResultScreenState extends State<ResultScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+
+  bool _showProcessing = true;
+  bool _showResult = false;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.5, 1, curve: Curves.easeIn),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.7, 1, curve: Curves.elasticOut),
+      ),
+    );
+
+    // Start processing animation
+    _startProcessingAnimation();
+  }
+
+  void _startProcessingAnimation() async {
+    // Simulate processing time
+    await Future.delayed(const Duration(seconds: 1));
+    
+    // Show the processing UI
+    setState(() {
+      _showProcessing = true;
+    });
+
+    // Simulate longer processing time
+    await Future.delayed(const Duration(seconds: 2));
+
+    // Hide processing and show result
+    setState(() {
+      _showProcessing = false;
+      _showResult = true;
+    });
+
+    // Start the result animation
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildProcessingUI() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 100),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.teal.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Transform.rotate(
+                    angle: _controller.value * 2 * 3.1416,
+                    child: child,
+                  );
+                },
+                child: const Icon(
+                  Icons.cached,
+                  size: 60,
+                  color: Colors.teal,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+          const Text(
+            'Analyzing Your Data',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.teal,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Our AI is carefully reviewing your symptoms\nand health metrics...',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 32),
+          SizedBox(
+            width: 200,
+            child: LinearProgressIndicator(
+              backgroundColor: Colors.teal.withOpacity(0.2),
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.teal),
+              minHeight: 8,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultUI(BuildContext context, Map<String, dynamic> result) {
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
         child: Column(
           children: [
             Card(
@@ -117,6 +247,28 @@ class ResultScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final result = Provider.of<ClassificationProvider>(context).result;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Analysis Result'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          child: _showProcessing
+              ? _buildProcessingUI()
+              : _showResult
+                  ? _buildResultUI(context, result)
+                  : const SizedBox(),
         ),
       ),
     );
