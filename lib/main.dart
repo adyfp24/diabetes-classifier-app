@@ -24,15 +24,49 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Diabetes Classifier',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        colorScheme: ColorScheme.light(
+          primary: Colors.teal,
+          secondary: Colors.tealAccent[400]!,
+          surface: Colors.white,
+          background: Colors.grey[50]!,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.teal,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: true,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.teal.withOpacity(0.4)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.teal, width: 2),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+          ),
+        ),
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => LandingScreen(),
-        '/symptom': (context) => SymptomScreen(),
-        '/result': (context) => ResultScreen(),
+        '/': (context) => const LandingScreen(),
+        '/symptom': (context) => const SymptomScreen(),
+        '/result': (context) => const ResultScreen(),
       },
     );
   }
