@@ -118,7 +118,7 @@ class _ResultScreenState extends State<ResultScreen>
           ),
           const SizedBox(height: 16),
           Text(
-            'Our AI is carefully reviewing your symptoms\nand health metrics...',
+            'AI kami sedang menganalisis data...',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
@@ -197,7 +197,7 @@ class _ResultScreenState extends State<ResultScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Recommendations',
+                      'Rekomendasi',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.primary,
@@ -208,7 +208,7 @@ class _ResultScreenState extends State<ResultScreen>
                     const SizedBox(height: 16),
                     if (result['prediction'] == 'High Risk') ...[
                       const Text(
-                        'Next Steps:',
+                        'Langkah Penanganan :',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
@@ -217,7 +217,7 @@ class _ResultScreenState extends State<ResultScreen>
                       const Text('3. Ikuti resep dokter dan olahraga secara teratur'),
                     ] else ...[
                       const Text(
-                        'Preventive Measures:',
+                        'Langkah Pencegahan2:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
@@ -258,7 +258,7 @@ class _ResultScreenState extends State<ResultScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analysis Result'),
+        title: const Text('Hasil Analisis'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

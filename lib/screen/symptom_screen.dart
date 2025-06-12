@@ -31,9 +31,7 @@ class _SymptomScreenState extends State<SymptomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Informasi Medis'),
-      ),
+      appBar: AppBar(title: const Text('Informasi Medis')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -44,9 +42,9 @@ class _SymptomScreenState extends State<SymptomScreen> {
               Text(
                 'Personal Details',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -88,10 +86,10 @@ class _SymptomScreenState extends State<SymptomScreen> {
                   prefixIcon: Icon(Icons.people),
                 ),
                 items: ['Male', 'Female', 'Other']
-                    .map((gender) => DropdownMenuItem(
-                          value: gender,
-                          child: Text(gender),
-                        ))
+                    .map(
+                      (gender) =>
+                          DropdownMenuItem(value: gender, child: Text(gender)),
+                    )
                     .toList(),
                 onChanged: (value) {
                   setState(() {
@@ -107,10 +105,10 @@ class _SymptomScreenState extends State<SymptomScreen> {
                   prefixIcon: Icon(Icons.bloodtype),
                 ),
                 items: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
-                    .map((type) => DropdownMenuItem(
-                          value: type,
-                          child: Text(type),
-                        ))
+                    .map(
+                      (type) =>
+                          DropdownMenuItem(value: type, child: Text(type)),
+                    )
                     .toList(),
                 onChanged: (value) {
                   setState(() {
@@ -141,9 +139,9 @@ class _SymptomScreenState extends State<SymptomScreen> {
               Text(
                 'Symptoms',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               const Text('Select all that apply:'),
@@ -181,29 +179,34 @@ class _SymptomScreenState extends State<SymptomScreen> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       final provider = Provider.of<ClassificationProvider>(
-                          context,
-                          listen: false);
-                      
+                        context,
+                        listen: false,
+                      );
+
                       // Show loading
                       provider.setLoading(true);
-                      
+
                       // Simulate API call delay
                       await Future.delayed(const Duration(seconds: 2));
-                      
+
                       // Create dummy result
                       final result = {
-                        'prediction': _selectedSymptoms.length > 3 
-                            ? 'High Risk' 
+                        'prediction': _selectedSymptoms.length > 3
+                            ? 'High Risk'
                             : 'Low Risk',
-                        'confidence': (_selectedSymptoms.length / _symptomsList.length * 100).toStringAsFixed(1),
+                        'confidence':
+                            (_selectedSymptoms.length /
+                                    _symptomsList.length *
+                                    100)
+                                .toStringAsFixed(1),
                         'recommendations': _selectedSymptoms.length > 3
-                            ? 'We recommend consulting with a healthcare professional for further evaluation.'
-                            : 'Maintain a healthy lifestyle and monitor your symptoms.',
+                            ? 'Kami rekomendasikan untuk melakukan pemeriksaan lebih lanjut ke dokter.'
+                            : 'Lakukan gaya hidup sehat untuk menjaga kesehatan Anda.',
                       };
-                      
+
                       provider.setLoading(false);
                       provider.setResult(result);
-                      
+
                       Navigator.pushNamed(context, '/result');
                     }
                   },
