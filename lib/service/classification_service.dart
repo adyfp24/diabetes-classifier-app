@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_knn_app/model/medical_data.dart';
 
 class ClassificationService {
-  static const String baseUrl = 'http://localhost:5500'; 
+  static const String baseUrl = 'http://localhost:5501'; 
   
   Future<Result> classifyMedicalData(MedicalData data) async {
     try {

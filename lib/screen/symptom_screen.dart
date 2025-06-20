@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_knn_app/model/medical_data.dart';
-import 'package:flutter_knn_app/model/symptom.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_knn_app/provider/classification_provider.dart';
 
@@ -20,23 +19,6 @@ class _SymptomScreenState extends State<SymptomScreen> {
   final _insulinController = TextEditingController();
   final _bmiController = TextEditingController();
   final _ageController = TextEditingController();
-
-  final List<Symptom> _selectedSymptoms = [];
-
-  final List<Symptom> _symptomsList = [
-    Symptom(name: 'Increased thirst'),
-    Symptom(name: 'Frequent urination'),
-    Symptom(name: 'Extreme hunger'),
-    Symptom(name: 'Unexplained weight loss'),
-    Symptom(name: 'Fatigue'),
-    Symptom(name: 'Blurred vision'),
-    Symptom(name: 'Slow-healing sores'),
-    Symptom(name: 'Frequent infections'),
-    Symptom(name: 'Tingling in hands/feet'),
-    Symptom(name: 'Dry mouth'),
-    Symptom(name: 'Nausea'),
-    Symptom(name: 'Vomiting'),
-  ];
 
   @override
   void dispose() {
@@ -60,63 +42,24 @@ class _SymptomScreenState extends State<SymptomScreen> {
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: Colors.teal.shade600),
         suffixText: suffix,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       ),
       keyboardType: inputType,
+      style: const TextStyle(fontSize: 16),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter $label';
         }
         return null;
       },
-    );
-  }
-
-  Widget _buildSymptomsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Select Symptoms',
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: _symptomsList.map((symptom) {
-            final isSelected = _selectedSymptoms.contains(symptom);
-            return FilterChip(
-              label: Text(symptom.name),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() {
-                  selected
-                      ? _selectedSymptoms.add(symptom)
-                      : _selectedSymptoms.remove(symptom);
-                });
-              },
-              selectedColor: Colors.teal,
-              checkmarkColor: Colors.white,
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : Colors.black87,
-              ),
-            );
-          }).toList(),
-        ),
-        if (_selectedSymptoms.isEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'Please select at least one symptom',
-              style: TextStyle(color: Colors.red[700], fontSize: 12),
-            ),
-          ),
-      ],
     );
   }
 
@@ -127,24 +70,28 @@ class _SymptomScreenState extends State<SymptomScreen> {
           controller: _pregnanciesController,
           label: 'Pregnancies',
           icon: Icons.pregnant_woman,
+          suffix: 'x',
         ),
         const SizedBox(height: 16),
         _buildInputField(
           controller: _glucoseController,
           label: 'Glucose',
           icon: Icons.bloodtype,
+          suffix: 'mg/dL',
         ),
         const SizedBox(height: 16),
         _buildInputField(
           controller: _skinThicknessController,
           label: 'Skin Thickness',
           icon: Icons.format_line_spacing,
+          suffix: 'mm',
         ),
         const SizedBox(height: 16),
         _buildInputField(
           controller: _insulinController,
           label: 'Insulin',
           icon: Icons.opacity,
+          suffix: 'μU/mL',
         ),
         const SizedBox(height: 16),
         _buildInputField(
@@ -159,20 +106,15 @@ class _SymptomScreenState extends State<SymptomScreen> {
           controller: _ageController,
           label: 'Age',
           icon: Icons.cake,
+          suffix: 'yrs',
         ),
         const SizedBox(height: 24),
-        _buildSymptomsSection(),
       ],
     );
   }
 
   Future<void> _handleAnalyze() async {
     if (!_formKey.currentState!.validate()) return;
-
-    if (_selectedSymptoms.isEmpty) {
-      setState(() {});
-      return;
-    }
 
     final medicalData = MedicalData(
       pregnancies: int.parse(_pregnanciesController.text),
@@ -181,7 +123,7 @@ class _SymptomScreenState extends State<SymptomScreen> {
       insulin: int.parse(_insulinController.text),
       bmi: double.parse(_bmiController.text),
       age: int.parse(_ageController.text),
-      symptoms: _selectedSymptoms,
+      symptoms: [],
     );
 
     final provider = Provider.of<ClassificationProvider>(
@@ -212,13 +154,15 @@ class _SymptomScreenState extends State<SymptomScreen> {
       builder: (context, provider, _) {
         return SizedBox(
           width: double.infinity,
-          height: 50,
+          height: 56,
           child: ElevatedButton.icon(
             onPressed: provider.isLoading ? null : _handleAnalyze,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal,
+              backgroundColor: Colors.teal.shade600,
+              foregroundColor: Colors.white,
+              elevation: 2,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
             icon: provider.isLoading
@@ -232,8 +176,11 @@ class _SymptomScreenState extends State<SymptomScreen> {
                   )
                 : const Icon(Icons.analytics),
             label: Text(
-              provider.isLoading ? 'Analyzing...' : 'Analyze Symptoms',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              provider.isLoading ? 'Analyzing...' : 'Analyze Now',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ),
         );
@@ -244,22 +191,41 @@ class _SymptomScreenState extends State<SymptomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text('Diabetes Analyzer'),
-        backgroundColor: Colors.teal,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              _buildFormSection(),
-              const SizedBox(height: 32),
-              _buildSubmitButton(),
-            ],
+        backgroundColor: Colors.white,
+        elevation: 1,
+        centerTitle: true,
+        title: const Text(
+          'Diabetes Analyzer',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.teal,
           ),
         ),
+        iconTheme: const IconThemeData(color: Colors.teal),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildFormSection(),
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: _buildSubmitButton(),
+          ),
+        ],
       ),
     );
   }

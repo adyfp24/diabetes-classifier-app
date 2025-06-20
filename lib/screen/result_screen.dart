@@ -20,7 +20,7 @@ class _ResultScreenState extends State<ResultScreen>
   @override
   void initState() {
     super.initState();
-    
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -61,7 +61,7 @@ class _ResultScreenState extends State<ResultScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analysis Result'),
+        title: const Text('Hasil Analisis Diabetes'),
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -69,9 +69,7 @@ class _ResultScreenState extends State<ResultScreen>
       body: Consumer<ClassificationProvider>(
         builder: (context, provider, child) {
           if (!provider.hasResult) {
-            return const Center(
-              child: Text('No analysis result available'),
-            );
+            return const Center(child: Text('No analysis result available'));
           }
 
           return AnimatedBuilder(
@@ -81,29 +79,32 @@ class _ResultScreenState extends State<ResultScreen>
                 opacity: _fadeAnimation,
                 child: Transform.translate(
                   offset: Offset(0, _slideAnimation.value),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        _buildResultHeader(provider),
-                        const SizedBox(height: 24),
-                        _buildPatientInfo(provider),
-                        const SizedBox(height: 24),
-                        // _buildRecommendations(provider),
-                        // if (provider.result['risk_factors'] != null)
-                        //   ...[
-                        //     const SizedBox(height: 24),
-                        //     _buildRiskFactors(provider),
-                        //   ],
-                        // if (provider.result['next_steps'] != null)
-                        //   ...[
-                        //     const SizedBox(height: 24),
-                        //     _buildNextSteps(provider),
-                        //   ],
-                        const SizedBox(height: 32),
-                        _buildActionButtons(),
-                      ],
-                    ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: IntrinsicHeight(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _buildResultHeader(provider),
+                                const SizedBox(height: 24),
+                                _buildPatientInfo(provider),
+                                const SizedBox(height: 24),
+                                // Tambahkan elemen lain jika diperlukan
+                                Spacer(),
+                                _buildActionButtons(),
+                                const SizedBox(height: 28),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               );
@@ -115,29 +116,34 @@ class _ResultScreenState extends State<ResultScreen>
   }
 
   Widget _buildResultHeader(ClassificationProvider provider) {
-    final result = provider.result;
-    final isHighRisk = provider.isHighRisk;
-    
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: Card(
-        elevation: 8,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+  final result = provider.result;
+  final isHighRisk = provider.isHighRisk;
+
+  return ScaleTransition(
+    scale: _scaleAnimation,
+    child: Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: isHighRisk
+              ? [Colors.orange.shade400, Colors.deepOrange.shade600]
+              : [Colors.teal.shade400, Colors.teal.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Container(
-          width: double.infinity,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          )
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
           padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              colors: isHighRisk 
-                ? [Colors.orange.shade400, Colors.deepOrange.shade600]
-                : [Colors.teal.shade400, Colors.teal.shade600],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
           child: Column(
             children: [
               Container(
@@ -147,16 +153,16 @@ class _ResultScreenState extends State<ResultScreen>
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isHighRisk 
-                    ? Icons.warning_amber_rounded
-                    : Icons.check_circle_outline,
+                  isHighRisk
+                      ? Icons.warning_amber_rounded
+                      : Icons.check_circle_outline,
                   size: 60,
                   color: Colors.white,
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                result!.result,
+                result!.prediction == 1 ? 'Positif Diabetes' : 'Negatif Diabetes',
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -165,13 +171,16 @@ class _ResultScreenState extends State<ResultScreen>
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'Confidence: ${result!.prediction}%',
+                  'Confidence: ${result.prediction}%',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -183,8 +192,10 @@ class _ResultScreenState extends State<ResultScreen>
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildPatientInfo(ClassificationProvider provider) {
     final data = provider.currentData;
@@ -203,7 +214,7 @@ class _ResultScreenState extends State<ResultScreen>
                 Icon(Icons.person, color: Colors.teal.shade600),
                 const SizedBox(width: 8),
                 Text(
-                  'Patient Information',
+                  'Informasi pasien',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -213,9 +224,9 @@ class _ResultScreenState extends State<ResultScreen>
               ],
             ),
             const SizedBox(height: 16),
-            _buildInfoRow('Age', '${data.age} years old'),
+            _buildInfoRow('Usia', '${data.age} tahun'),
             _buildInfoRow('BMI', '${data.bmi.toStringAsFixed(1)} kg/m²'),
-            _buildInfoRow('Symptoms', '${data.symptoms!.length} selected'),
+            _buildInfoRow('Gejala', '${data.symptoms!.length} selected'),
           ],
         ),
       ),
@@ -241,9 +252,7 @@ class _ResultScreenState extends State<ResultScreen>
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -387,7 +396,7 @@ class _ResultScreenState extends State<ResultScreen>
   //           ...nextSteps.asMap().entries.map((entry) {
   //             final index = entry.key + 1;
   //             final step = entry.value.toString();
-              
+
   //             return Container(
   //               margin: const EdgeInsets.only(bottom: 8),
   //               padding: const EdgeInsets.all(12),
@@ -447,11 +456,8 @@ class _ResultScreenState extends State<ResultScreen>
             },
             icon: const Icon(Icons.refresh),
             label: const Text(
-              'New Assessment',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              'Asesment Baru',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.teal,

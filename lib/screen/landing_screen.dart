@@ -11,21 +11,21 @@ class _LandingScreenState extends State<LandingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, String>> onboardingData = [
+  final List<Map<String, dynamic>> onboardingData = [
     {
-      'title': 'Diabetes Risk Classifier',
+      'title': 'Diabetes Classifier App',
       'description': 'Periksa risiko diabetes Anda dengan bantuan AI',
-      'image': 'assets/images/diabetes1.png', // Replace with your actual assets
+      'icon': Icons.health_and_safety_outlined, 
     },
     {
       'title': 'Easy to Use',
       'description': 'Cukup isi beberapa informasi untuk mengukur risiko diabetes Anda',
-      'image': 'assets/images/diabetes2.png',
+      'icon': Icons.medical_information_outlined,
     },
     {
       'title': 'Instant Results',
       'description': 'Dapatkan hasil risiko diabetes Anda secara cepat dan akurat',
-      'image': 'assets/images/diabetes3.png',
+      'icon': Icons.flash_on_outlined,
     },
   ];
 
@@ -49,7 +49,7 @@ class _LandingScreenState extends State<LandingScreen> {
                   return OnboardingPage(
                     title: onboardingData[index]['title']!,
                     description: onboardingData[index]['description']!,
-                    image: onboardingData[index]['image']!,
+                    icon: onboardingData[index]['icon']!,
                   );
                 },
               ),
@@ -100,10 +100,13 @@ class _LandingScreenState extends State<LandingScreen> {
                         );
                       }
                     },
-                    child: Text(
-                      _currentPage == onboardingData.length - 1
-                          ? 'Get Started'
-                          : 'Next',
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                      child: Text(
+                        _currentPage == onboardingData.length - 1
+                            ? 'Get Started'
+                            : 'Next',
+                      ),
                     ),
                   ),
                 ],
@@ -119,13 +122,13 @@ class _LandingScreenState extends State<LandingScreen> {
 class OnboardingPage extends StatelessWidget {
   final String title;
   final String description;
-  final String image;
+  final IconData icon;
 
   const OnboardingPage({
     super.key,
     required this.title,
     required this.description,
-    required this.image,
+    required this.icon,
   });
 
   @override
@@ -144,7 +147,7 @@ class OnboardingPage extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.medical_services,
+              icon,
               size: 100,
               color: Theme.of(context).colorScheme.secondary,
             ),
